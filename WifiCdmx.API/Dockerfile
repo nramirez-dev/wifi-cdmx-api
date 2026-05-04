@@ -8,7 +8,7 @@ COPY WifiCdmx.Application/WifiCdmx.Application.csproj WifiCdmx.Application/
 COPY WifiCdmx.Domain/WifiCdmx.Domain.csproj WifiCdmx.Domain/
 COPY WifiCdmx.Infrastructure/WifiCdmx.Infrastructure.csproj WifiCdmx.Infrastructure/
 
-RUN dotnet restore
+RUN dotnet restore WifiCdmx.API/WifiCdmx.API.csproj
 
 COPY . .
 

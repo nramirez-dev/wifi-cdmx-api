@@ -51,11 +51,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // --- Middleware ---
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WiFi CDMX API v1"));
-}
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WiFi CDMX API v1"));
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
