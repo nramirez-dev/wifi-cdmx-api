@@ -1,66 +1,96 @@
 using WifiCdmx.Application.DTOs;
 using WifiCdmx.Application.Interfaces;
 using WifiCdmx.Domain.Entities;
+using WifiCdmx.Application.Extensions;
 
 namespace WifiCdmx.Application.Services;
 
 /// <summary>
 /// Business logic layer for WiFi point operations.
-/// Maps domain entities to DTOs before returning to the API layer.
+/// Applies functional programming principles throughout:
+/// - Pure static functions for data transformation
+/// - Curried functions for partial application
+/// - Pattern matching for Option-like null handling
+/// - Immutable records as DTOs
+/// - Concurrent async composition
 /// </summary>
 public class WifiPointService(IWifiPointRepository repository) : IWifiPointService
 {
-    public async Task<PagedResultDto<WifiPointDto>> GetAllAsync(int page, int pageSize)
-    {
-        var (items, total) = await repository.GetAllAsync(page, pageSize);
-        return ToPagedResult(items, total, page, pageSize);
-    }
+    public async Task<PagedResultDto<WifiPointDto>> GetAllAsync(int page, int pageSize) =>
+        await repository.GetAllAsync(page, pageSize)
+            .MapAsync(ToPagedResult(page, pageSize));
 
-    public async Task<WifiPointDto?> GetByIdAsync(Guid id)
-    {
-        var point = await repository.GetByIdAsync(id);
-        return point is null ? null : ToDto(point);
-    }
+    public async Task<WifiPointDto?> GetByIdAsync(Guid id) =>
+        await repository.GetByIdAsync(id)
+            .MapAsync(ToNullableDto);
 
     public async Task<PagedResultDto<WifiPointDto>> GetByBoroughAsync(
-        string borough, int page, int pageSize)
-    {
-        var (items, total) = await repository.GetByBoroughAsync(borough, page, pageSize);
-        return ToPagedResult(items, total, page, pageSize);
-    }
+        string borough, int page, int pageSize) =>
+        await repository.GetByBoroughAsync(borough, page, pageSize)
+            .MapAsync(ToPagedResult(page, pageSize));
 
     public async Task<PagedResultDto<WifiPointDto>> GetNearbyAsync(
-        double latitude, double longitude, int page, int pageSize)
-    {
-        var (items, total) = await repository.GetNearbyAsync(latitude, longitude, page, pageSize);
-        return ToPagedResult(items, total, page, pageSize);
-    }
+        double latitude, double longitude, int page, int pageSize) =>
+        await repository.GetNearbyAsync(latitude, longitude, page, pageSize)
+            .MapAsync(ToPagedResult(page, pageSize));
 
     public async Task<StatsDto> GetStatsAsync()
     {
-        var byBorough = await repository.GetStatsByBoroughAsync();
-        var byProgram = await repository.GetStatsByProgramAsync();
-        var totalPoints = await repository.GetAllAsync(1, int.MaxValue);
+        // Concurrent async composition — all queries run in parallel
+        var (byBorough, byProgram, all) = await (
+            repository.GetStatsByBoroughAsync(),
+            repository.GetStatsByProgramAsync(),
+            repository.GetAllAsync(1, int.MaxValue)
+        ).WhenAll();
 
         return new StatsDto(
-            TotalPoints: totalPoints.Total,
+            TotalPoints: all.Total,
             TotalAccessPoints: byBorough.Values.Sum(),
             ByBorough: byBorough,
             ByProgram: byProgram
         );
     }
 
-    public async Task<IEnumerable<HeatmapCellDto>> GetHeatmapAsync(double gridSize = 0.01) =>
+    public async Task<IEnumerable<HeatmapCellDto>> GetHeatmapAsync(double gridSize) =>
         await repository.GetHeatmapAsync(gridSize);
 
-    // --- Private helpers ---
+    // --- Pure transformation functions ---
 
-    private static WifiPointDto ToDto(WifiPoint w) => new(
-        w.Id, w.Name, w.Neighborhood, w.Borough,
-        w.Latitude, w.Longitude, w.AccessPointCount, w.Program
+    /// <summary>
+    /// Pure function: maps a domain entity to a DTO.
+    /// No side effects — same input always produces same output.
+    /// </summary>
+    private static WifiPointDto ToDto(WifiPoint point) => new(
+        point.Id,
+        point.Name,
+        point.Neighborhood,
+        point.Borough,
+        point.Latitude,
+        point.Longitude,
+        point.AccessPointCount,
+        point.Program
     );
 
-    private static PagedResultDto<WifiPointDto> ToPagedResult(
-        IEnumerable<WifiPoint> items, int total, int page, int pageSize) =>
-        new(items.Select(ToDto), total, page, pageSize);
+    /// <summary>
+    /// Option-like null handling using pattern matching.
+    /// Transforms the value if present, returns null otherwise.
+    /// </summary>
+    private static WifiPointDto? ToNullableDto(WifiPoint? point) => point switch
+    {
+        null => null,
+        var p => ToDto(p)
+    };
+
+    /// <summary>
+    /// Curried function — returns a transformation function pre-loaded with
+    /// pagination parameters. Enables clean pipeline composition.
+    /// </summary>
+    private static Func<(IEnumerable<WifiPoint> Items, int Total), PagedResultDto<WifiPointDto>>
+        ToPagedResult(int page, int pageSize) =>
+            result => new PagedResultDto<WifiPointDto>(
+                result.Items.Select(ToDto),
+                result.Total,
+                page,
+                pageSize
+            );
 }
