@@ -16,7 +16,7 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
         return ToPagedResult(items, total, page, pageSize);
     }
 
-    public async Task<WifiPointDto?> GetByIdAsync(string id)
+    public async Task<WifiPointDto?> GetByIdAsync(Guid id)
     {
         var point = await repository.GetByIdAsync(id);
         return point is null ? null : ToDto(point);
@@ -53,7 +53,7 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
     // --- Private helpers ---
 
     private static WifiPointDto ToDto(WifiPoint w) => new(
-        w.Id, w.Neighborhood, w.Borough,
+        w.Id, w.Name, w.Neighborhood, w.Borough,
         w.Latitude, w.Longitude, w.AccessPointCount, w.Program
     );
 

@@ -48,7 +48,8 @@ public class CsvSeeder(IWifiPointRepository repository, ILogger<CsvSeeder> logge
         {
             var point = new WifiPoint
             {
-                Id = csv.GetField("ID") ?? Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
+                Name = csv.GetField("ID") ?? string.Empty,
                 Neighborhood = csv.GetField("Colonia") ?? string.Empty,
                 Borough = csv.GetField("Alcaldía") ?? string.Empty,
                 Latitude = csv.GetField<double>("Latitud"),

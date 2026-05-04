@@ -31,10 +31,10 @@ public class WifiPointsController(IWifiPointService service) : ControllerBase
     /// <summary>
     /// Returns a single WiFi point by its ID.
     /// </summary>
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(WifiPointDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(string id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var result = await service.GetByIdAsync(id);
         return result is null ? NotFound() : Ok(result);

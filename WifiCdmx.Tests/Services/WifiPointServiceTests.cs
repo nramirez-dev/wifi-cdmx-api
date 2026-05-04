@@ -81,12 +81,13 @@ public class WifiPointServiceTests
     public async Task GetByIdAsync_ReturnsNull_WhenPointDoesNotExist()
     {
         // Arrange
+        var nonExistentId = Guid.NewGuid();
         _repositoryMock
-            .Setup(r => r.GetByIdAsync("non-existent-id"))
+            .Setup(r => r.GetByIdAsync(nonExistentId))
             .ReturnsAsync((WifiPoint?)null);
 
         // Act
-        var result = await _service.GetByIdAsync("non-existent-id");
+        var result = await _service.GetByIdAsync(nonExistentId);
 
         // Assert
         Assert.Null(result);
@@ -172,7 +173,8 @@ public class WifiPointServiceTests
     private static List<WifiPoint> GenerateFakePoints(int count, string borough = "ÁLVARO OBREGÓN") =>
         Enumerable.Range(1, count).Select(i => new WifiPoint
         {
-            Id = $"point-{i}",
+            Id = Guid.NewGuid(),
+            Name = $"Point {i}",
             Neighborhood = $"Colonia {i}",
             Borough = borough,
             Latitude = 19.4326 + i * 0.001,

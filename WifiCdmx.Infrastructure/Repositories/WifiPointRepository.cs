@@ -22,7 +22,7 @@ public class WifiPointRepository(AppDbContext context) : IWifiPointRepository
         return (items, total);
     }
 
-    public async Task<WifiPoint?> GetByIdAsync(string id) =>
+    public async Task<WifiPoint?> GetByIdAsync(Guid id) =>
         await context.WifiPoints.AsNoTracking()
             .FirstOrDefaultAsync(w => w.Id == id);
 

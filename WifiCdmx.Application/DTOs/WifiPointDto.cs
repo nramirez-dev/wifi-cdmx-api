@@ -4,7 +4,8 @@ namespace WifiCdmx.Application.DTOs;
 /// Data transfer object for a WiFi access point.
 /// </summary>
 public record WifiPointDto(
-    string Id,
+    Guid Id,
+    string Name,
     string Neighborhood,
     string Borough,
     double Latitude,
