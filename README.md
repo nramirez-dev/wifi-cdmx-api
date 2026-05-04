@@ -27,17 +27,8 @@ The `/api/wifi-points/heatmap` endpoint returns geographic grid data ready to be
 ## Architecture
 
 This project follows **Clean Architecture** with clear separation of concerns across 4 layers:
-```
-┌─────────────────────────────────────┐
-│           WifiCdmx.API              │  HTTP Controllers, Swagger, Middleware
-├─────────────────────────────────────┤
-│        WifiCdmx.Application         │  Business Logic, Interfaces, DTOs
-├─────────────────────────────────────┤
-│       WifiCdmx.Infrastructure       │  EF Core, PostgreSQL, CSV Seeder
-├─────────────────────────────────────┤
-│          WifiCdmx.Domain            │  Entities (no dependencies)
-└─────────────────────────────────────┘
-```
+
+![System Architecture](docs/architecture.png)
 
 **Dependency rule:** outer layers depend on inner layers, never the reverse.
 
@@ -153,8 +144,9 @@ All list endpoints support:
 ## Getting Started
 
 ### Prerequisites
-- Docker Desktop
-- make (optional but recommended)
+- Docker Desktop installed and running
+- `make` (optional but recommended)
+- A copy of `wifi_cdmx.csv` placed inside the `data/` folder at the solution root
 
 ### 1. Clone the repository
 ```bash
@@ -165,33 +157,45 @@ cd wifi-cdmx-api
 ### 2. Set up environment variables
 ```bash
 cp .env.example .env
-# Edit .env with your preferred credentials
 ```
+Open `.env` and set your preferred database password.
 
 ### 3. Add the CSV dataset
-Place the `wifi_cdmx.csv` file inside the `data/` folder at the project root.
-The API will automatically seed the database on first startup.
+Place `wifi_cdmx.csv` inside the `data/` folder:
+```
+wifi-cdmx-api/
+└── data/
+    └── wifi_cdmx.csv
+```
+The API will automatically read, process and seed the database on first startup.
 
-### 4. Start the services
+### 4. Start all services
 ```bash
 make up
 # or
 docker-compose up -d
 ```
 
-### 5. Access the API
-- Swagger UI: http://localhost:5000/swagger
-- API Base: http://localhost:5000/api/wifi-points
-
-### Available Make commands
+### 5. Verify the API is running
 ```bash
-make up       # Start all services
-make down     # Stop all services
-make build    # Rebuild Docker images
-make logs     # Follow API logs
-make migrate  # Run EF Core migrations locally
-make clean    # Remove containers and volumes (resets DB)
+make logs
+# or
+docker-compose logs -f api
 ```
+You should see: `Seeded 539 WiFi points successfully`
+
+### 6. Open Swagger UI
+http://localhost:5000/swagger
+
+### Available commands
+| Command | Description |
+|---|---|
+| `make up` | Start all services |
+| `make down` | Stop all services |
+| `make build` | Rebuild Docker images |
+| `make logs` | Follow API logs |
+| `make migrate` | Run EF Core migrations locally |
+| `make clean` | Remove containers and volumes |
 
 ---
 
