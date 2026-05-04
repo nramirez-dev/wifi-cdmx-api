@@ -245,17 +245,23 @@ Functional programming principles were applied throughout: pure static mapping f
 
 ## Design Decisions
 
-**Why PostgreSQL?**
-Relational structure fits the dataset well. Indexes on `Borough` and `Program` make the most common queries fast without needing a full-text search engine.
+**Why PostgreSQL over NoSQL?**
+The dataset has a fixed schema and benefits from indexed queries on `Borough` and `Program`. SQL fits naturally.
 
-**Why Haversine in EF Core instead of PostGIS?**
-PostGIS adds operational complexity. For a dataset of ~500 points, the Haversine formula translated by EF Core into SQL is efficient enough and keeps the stack simple.
+**Why Haversine instead of PostGIS?**
+PostGIS adds operational overhead. For ~500 points, Haversine calculated by EF Core is efficient enough and keeps the stack lean.
+
+**Why Guid as primary key?**
+The CSV uses descriptive names as IDs (e.g. "Alameda Central") which break URLs. Guid keeps the API clean while the original name is preserved in the `Name` field.
 
 **Why Clean Architecture?**
-Separating Domain, Application and Infrastructure makes the codebase testable — the service layer is fully unit-testable with mocked repositories, no database required.
+Each layer has a single responsibility. The service layer is fully unit-testable with mocked repositories — no database required to run tests.
 
-**Why CSV auto-seed on startup?**
-Zero manual steps to get a running instance. `docker-compose up` is all you need.
+**Why functional patterns in WifiPointService?**
+`MapAsync`, curried functions and pattern matching replace imperative null checks and loops. These patterns map directly to concepts in typed functional languages.
 
-**Stats endpoint (bonus)**
-Not required by the spec but natural for a data company — aggregated views of the dataset show awareness of the data beyond simple CRUD.
+**Why a Heatmap endpoint?**
+A data company needs to visualize data. This endpoint returns pre-aggregated geographic grid cells ready for Kepler.gl, Leaflet or Google Maps — no client-side aggregation needed.
+
+**Why auto-seed on startup?**
+Zero manual steps. `docker-compose up` creates the database, runs migrations and loads 539 WiFi points automatically.
