@@ -86,4 +86,19 @@ public class WifiPointsController(IWifiPointService service) : ControllerBase
         var result = await service.GetStatsAsync();
         return Ok(result);
     }
+
+    /// <summary>
+    /// Returns geographic grid cells aggregating WiFi points for heatmap visualization.
+    /// </summary>
+    [HttpGet("heatmap")]
+    [ProducesResponseType(typeof(IEnumerable<HeatmapCellDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetHeatmap([FromQuery] double gridSize = 0.01)
+    {
+        if (gridSize <= 0 || gridSize > 1)
+            return BadRequest("gridSize must be between 0 and 1.");
+
+        var result = await service.GetHeatmapAsync(gridSize);
+        return Ok(result);
+    }
 }

@@ -1,3 +1,4 @@
+using WifiCdmx.Application.DTOs;
 using WifiCdmx.Domain.Entities;
 
 namespace WifiCdmx.Application.Interfaces;
@@ -16,4 +17,5 @@ public interface IWifiPointRepository
     Task<Dictionary<string, int>> GetStatsByProgramAsync();
     Task BulkInsertAsync(IEnumerable<WifiPoint> points);
     Task<bool> AnyAsync();
+    Task<IEnumerable<HeatmapCellDto>> GetHeatmapAsync(double gridSize);
 }

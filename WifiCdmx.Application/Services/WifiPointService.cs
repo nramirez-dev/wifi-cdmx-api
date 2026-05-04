@@ -50,6 +50,9 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
         );
     }
 
+    public async Task<IEnumerable<HeatmapCellDto>> GetHeatmapAsync(double gridSize = 0.01) =>
+        await repository.GetHeatmapAsync(gridSize);
+
     // --- Private helpers ---
 
     private static WifiPointDto ToDto(WifiPoint w) => new(

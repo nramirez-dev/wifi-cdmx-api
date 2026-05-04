@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WifiCdmx.Application.DTOs;
 using WifiCdmx.Application.Interfaces;
 using WifiCdmx.Domain.Entities;
 using WifiCdmx.Infrastructure.Data;
@@ -81,4 +82,22 @@ public class WifiPointRepository(AppDbContext context) : IWifiPointRepository
 
     public async Task<bool> AnyAsync() =>
         await context.WifiPoints.AnyAsync();
+
+    public async Task<IEnumerable<HeatmapCellDto>> GetHeatmapAsync(double gridSize = 0.01)
+    {
+        var points = await context.WifiPoints.AsNoTracking().ToListAsync();
+        return points
+            .GroupBy(p => (
+                Lat: Math.Round(p.Latitude / gridSize) * gridSize,
+                Lon: Math.Round(p.Longitude / gridSize) * gridSize
+            ))
+            .Select(g => new HeatmapCellDto(
+                Latitude: Math.Round(g.Key.Lat, 6),
+                Longitude: Math.Round(g.Key.Lon, 6),
+                PointCount: g.Count(),
+                TotalAccessPoints: g.Sum(p => p.AccessPointCount)
+            ))
+            .OrderByDescending(c => c.TotalAccessPoints)
+            .ToList();
+    }
 }
