@@ -58,10 +58,16 @@ coverage*/
 *.pubxml
 *.publishproj
 
+# Environment variables - never commit
+.env
+
+# Local settings with credentials
+appsettings.Development.json
+
 # App secrets / environment
 *.env
 *.env.*
-appsettings.Development.json
+!.env.example
 appsettings.Local.json
 secrets.json
 
