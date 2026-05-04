@@ -1,0 +1,6 @@
+@WifiCdmx.API_HostAddress = http://localhost:5155
+
+GET {{WifiCdmx.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

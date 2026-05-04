@@ -1,0 +1,71 @@
+## .NET / C# gitignore
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+!**/packages/repositories.config
+*.lock.json
+!package-lock.json
+project.lock.json
+artifacts/
+
+# User-specific files
+*.rsuser
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.suo
+*.userprefs
+*.pidb
+*.pdb
+*.mdb
+
+# Rider / JetBrains
+.idea/
+/_ReSharper.Caches/
+riderModule.iml
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResult.xml
+nunit-*.xml
+
+# Coverage
+coverage*/
+*.coverage
+*.coveragexml
+*.cobertura.xml
+
+# Publish
+[Pp]ublish/
+*.[Pp]ublish.xml
+*.pubxml
+*.publishproj
+
+# App secrets / environment
+*.env
+*.env.*
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
