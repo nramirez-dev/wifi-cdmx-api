@@ -2,6 +2,16 @@
 
 REST API for querying public WiFi access points in Mexico City, built with .NET 8 and PostgreSQL.
 
+## Preview
+
+The `/api/wifi-points/heatmap` endpoint returns geographic grid data ready to be visualized with tools like [Kepler.gl](https://kepler.gl/demo).
+
+![WiFi CDMX Heatmap](docs/heatmap-preview.png)
+
+*Distribution of 539 public WiFi access points across Mexico City grouped into geographic grid cells. Denser clusters indicate higher WiFi coverage.*
+
+---
+
 ## Table of Contents
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
@@ -209,6 +219,23 @@ make clean    # Remove containers and volumes (resets DB)
 | `Longitude` | `double precision` | Geographic longitude |
 | `AccessPointCount` | `int` | Number of APs at this location |
 | `Program` | `varchar(100)` | Installation program (indexed) |
+
+---
+
+## Bonus Features
+
+### Heatmap Endpoint
+`GET /api/wifi-points/heatmap?gridSize=0.01`
+
+Returns WiFi points aggregated into geographic grid cells, ready to feed mapping libraries like Kepler.gl, Leaflet or Google Maps. The `gridSize` parameter controls cell size in degrees (default `0.01` ≈ 1km²).
+
+### Stats Endpoint
+`GET /api/wifi-points/stats`
+
+Returns aggregated statistics across the full dataset — total points, total access points, and breakdowns by borough and program. Useful for dashboards and data exploration.
+
+### Functional Programming
+Functional programming principles were applied throughout: pure static mapping functions (`ToDto`, `ToPagedResult`), immutable DTOs using C# records, and LINQ method chaining for data transformations instead of imperative loops.
 
 ---
 

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WifiCdmx.Application\WifiCdmx.Application.csproj" />
+    <ProjectReference Include="..\WifiCdmx.Infrastructure\WifiCdmx.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
