@@ -77,5 +77,5 @@ Thumbs.db
 desktop.ini
 
 # Claude Code
-CLAUDE.md.claude/
-data/
+CLAUDE.md
+.claude/
