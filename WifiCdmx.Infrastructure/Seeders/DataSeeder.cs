@@ -34,19 +34,35 @@ public class DataSeeder(IWifiPointRepository repository, ILogger<DataSeeder> log
         var worksheet = workbook.Worksheet(1);
         var rows = worksheet.RangeUsed()!.RowsUsed().Skip(1);
 
+        int skipped = 0;
         foreach (var row in rows)
         {
+            var latStr = row.Cell(3).GetString();
+            var lonStr = row.Cell(4).GetString();
+
+            if (!double.TryParse(latStr, System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture, out var lat) ||
+                !double.TryParse(lonStr, System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture, out var lon))
+            {
+                skipped++;
+                continue;
+            }
+
             var point = new WifiPoint
             {
                 Id = Guid.NewGuid(),
                 OriginalId = row.Cell(1).GetString(),
                 Program = row.Cell(2).GetString(),
-                Latitude = row.Cell(3).GetValue<double>(),
-                Longitude = row.Cell(4).GetValue<double>(),
+                Latitude = lat,
+                Longitude = lon,
                 Borough = row.Cell(5).GetString(),
             };
             points.Add(point);
         }
+
+        if (skipped > 0)
+            logger.LogWarning("Skipped {Count} rows with unparseable coordinates.", skipped);
 
         await repository.BulkInsertAsync(points);
         logger.LogInformation("Seeded {Count} WiFi points successfully.", points.Count);
