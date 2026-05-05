@@ -44,8 +44,8 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
         return new StatsDto(
             TotalPoints: all.Total,
             TotalAccessPoints: byBorough.Values.Sum(),
-            ByBorough: byBorough,
-            ByProgram: byProgram
+            ByBorough: byBorough.Select(x => new StatEntryDto(x.Key, x.Value)),
+            ByProgram: byProgram.Select(x => new StatEntryDto(x.Key, x.Value))
         );
     }
 

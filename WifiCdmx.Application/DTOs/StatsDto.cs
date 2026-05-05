@@ -6,6 +6,6 @@ namespace WifiCdmx.Application.DTOs;
 public record StatsDto(
     int TotalPoints,
     int TotalAccessPoints,
-    Dictionary<string, int> ByBorough,
-    Dictionary<string, int> ByProgram
+    IEnumerable<StatEntryDto> ByBorough,
+    IEnumerable<StatEntryDto> ByProgram
 );

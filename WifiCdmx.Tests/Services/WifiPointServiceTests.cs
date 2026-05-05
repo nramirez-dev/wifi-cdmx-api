@@ -164,8 +164,8 @@ public class WifiPointServiceTests
         // Assert
         Assert.Equal(3, result.TotalPoints);
         Assert.Equal(15, result.TotalAccessPoints);
-        Assert.Equal(2, result.ByBorough.Count);
-        Assert.Equal(2, result.ByProgram.Count);
+        Assert.Equal(2, result.ByBorough.Count());
+        Assert.Equal(2, result.ByProgram.Count());
     }
 
     // --- Helpers ---
