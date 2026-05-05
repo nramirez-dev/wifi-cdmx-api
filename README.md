@@ -108,7 +108,8 @@ All list endpoints support:
 {
   "data": [
     {
-      "id": "T-III Dr. Manuel Escontria",
+      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "name": "T-III Dr. Manuel Escontria",
       "neighborhood": "SAN ANGEL",
       "borough": "ÁLVARO OBREGÓN",
       "latitude": 19.3428,
