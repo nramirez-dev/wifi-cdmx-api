@@ -60,13 +60,11 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
     /// </summary>
     private static WifiPointDto ToDto(WifiPoint point) => new(
         point.Id,
-        point.Name,
-        point.Neighborhood,
-        point.Borough,
+        point.OriginalId,
+        point.Program,
         point.Latitude,
         point.Longitude,
-        point.AccessPointCount,
-        point.Program
+        point.Borough
     );
 
     /// <summary>

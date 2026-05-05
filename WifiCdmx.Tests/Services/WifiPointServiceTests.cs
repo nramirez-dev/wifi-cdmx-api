@@ -174,12 +174,10 @@ public class WifiPointServiceTests
         Enumerable.Range(1, count).Select(i => new WifiPoint
         {
             Id = Guid.NewGuid(),
-            Name = $"Point {i}",
-            Neighborhood = $"Colonia {i}",
+            OriginalId = $"MEX-TEST-{i:D4}",
             Borough = borough,
             Latitude = 19.4326 + i * 0.001,
             Longitude = -99.1332 + i * 0.001,
-            AccessPointCount = i,
             Program = "PILARES"
         }).ToList();
 }

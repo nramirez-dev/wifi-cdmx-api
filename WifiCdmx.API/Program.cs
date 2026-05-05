@@ -14,7 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // --- Repositories & Services (Dependency Injection) ---
 builder.Services.AddScoped<IWifiPointRepository, WifiPointRepository>();
 builder.Services.AddScoped<IWifiPointService, WifiPointService>();
-builder.Services.AddScoped<CsvSeeder>();
+builder.Services.AddScoped<DataSeeder>();
 
 // --- Controllers ---
 builder.Services.AddControllers();
@@ -49,9 +49,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
 
-    var seeder = scope.ServiceProvider.GetRequiredService<CsvSeeder>();
-    var csvPath = builder.Configuration["CsvSeeder:FilePath"] ?? "Data/wifi_cdmx.csv";
-    await seeder.SeedAsync(csvPath);
+    var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    var filePath = builder.Configuration["DataSeeder:FilePath"] ?? "Data/wifi_cdmx.xlsx";
+    await seeder.SeedAsync(filePath);
 }
 
 // --- Middleware ---

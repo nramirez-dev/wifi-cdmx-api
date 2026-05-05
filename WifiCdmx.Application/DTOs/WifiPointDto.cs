@@ -5,11 +5,9 @@ namespace WifiCdmx.Application.DTOs;
 /// </summary>
 public record WifiPointDto(
     Guid Id,
-    string Name,
-    string Neighborhood,
-    string Borough,
+    string OriginalId,
+    string Program,
     double Latitude,
     double Longitude,
-    int AccessPointCount,
-    string Program
+    string Borough
 );

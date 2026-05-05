@@ -66,13 +66,13 @@ public class WifiPointRepository(AppDbContext context) : IWifiPointRepository
         await context.WifiPoints
             .AsNoTracking()
             .GroupBy(w => w.Borough)
-            .ToDictionaryAsync(g => g.Key, g => g.Sum(w => w.AccessPointCount));
+            .ToDictionaryAsync(g => g.Key, g => g.Count());
 
     public async Task<Dictionary<string, int>> GetStatsByProgramAsync() =>
         await context.WifiPoints
             .AsNoTracking()
             .GroupBy(w => w.Program)
-            .ToDictionaryAsync(g => g.Key, g => g.Sum(w => w.AccessPointCount));
+            .ToDictionaryAsync(g => g.Key, g => g.Count());
 
     public async Task BulkInsertAsync(IEnumerable<WifiPoint> points)
     {
@@ -95,7 +95,7 @@ public class WifiPointRepository(AppDbContext context) : IWifiPointRepository
                 Latitude: Math.Round(g.Key.Lat, 6),
                 Longitude: Math.Round(g.Key.Lon, 6),
                 PointCount: g.Count(),
-                TotalAccessPoints: g.Sum(p => p.AccessPointCount)
+                TotalAccessPoints: g.Count()
             ))
             .OrderByDescending(c => c.TotalAccessPoints)
             .ToList();
