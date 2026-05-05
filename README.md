@@ -17,6 +17,7 @@ The `/api/wifi-points/heatmap` endpoint returns geographic grid data ready to be
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
+- [GraphQL](#graphql)
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [Database Schema](#database-schema)
@@ -138,6 +139,83 @@ All list endpoints support:
   }
 }
 ```
+
+---
+
+## GraphQL
+
+In addition to the REST API, a GraphQL endpoint is available at `POST /graphql` powered by [HotChocolate](https://chillicream.com/docs/hotchocolate).
+
+### Available queries
+
+| Query | Description |
+|---|---|
+| `wifiPoints(page, pageSize)` | Paginated list of all WiFi points |
+| `wifiPointById(id)` | Single WiFi point by Guid |
+| `wifiPointsByBorough(borough, page, pageSize)` | WiFi points filtered by borough |
+| `nearbyWifiPoints(latitude, longitude, page, pageSize)` | WiFi points ordered by proximity |
+| `stats` | Aggregated statistics |
+| `heatmap(gridSize)` | Geographic grid cells for heatmap visualization |
+
+### Example queries
+
+**Get total points and access point count:**
+```graphql
+{
+  stats {
+    totalPoints
+    totalAccessPoints
+  }
+}
+```
+
+**Get first page of WiFi points, selecting specific fields:**
+```graphql
+{
+  wifiPoints(page: 1, pageSize: 5) {
+    total
+    data {
+      name
+      borough
+      neighborhood
+      latitude
+      longitude
+    }
+  }
+}
+```
+
+**Get nearby points:**
+```graphql
+{
+  nearbyWifiPoints(latitude: 19.4326, longitude: -99.1332, pageSize: 5) {
+    total
+    data {
+      name
+      borough
+      latitude
+      longitude
+    }
+  }
+}
+```
+
+**Get heatmap cells:**
+```graphql
+{
+  heatmap(gridSize: 0.01) {
+    latCell
+    lonCell
+    count
+  }
+}
+```
+
+### Banana Cake Pop (GraphQL IDE)
+
+HotChocolate ships with a built-in GraphQL IDE. Open it at:
+
+http://localhost:5000/graphql
 
 ---
 
