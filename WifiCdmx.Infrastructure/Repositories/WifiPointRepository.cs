@@ -27,6 +27,10 @@ public class WifiPointRepository(AppDbContext context) : IWifiPointRepository
         await context.WifiPoints.AsNoTracking()
             .FirstOrDefaultAsync(w => w.Id == id);
 
+    public async Task<WifiPoint?> GetByOriginalIdAsync(string originalId) =>
+        await context.WifiPoints.AsNoTracking()
+            .FirstOrDefaultAsync(w => w.OriginalId == originalId);
+
     public async Task<(IEnumerable<WifiPoint> Items, int Total)> GetByBoroughAsync(
         string borough, int page, int pageSize)
     {

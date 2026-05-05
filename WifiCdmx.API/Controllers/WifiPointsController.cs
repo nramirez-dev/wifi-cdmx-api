@@ -77,6 +77,19 @@ public class WifiPointsController(IWifiPointService service) : ControllerBase
     }
 
     /// <summary>
+    /// Returns a single WiFi point by its original ID from the official CDMX dataset.
+    /// Useful for cross-referencing with the official government open data portal.
+    /// </summary>
+    [HttpGet("by-original-id/{originalId}")]
+    [ProducesResponseType(typeof(WifiPointDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetByOriginalId(string originalId)
+    {
+        var result = await service.GetByOriginalIdAsync(originalId);
+        return result is null ? NotFound() : Ok(result);
+    }
+
+    /// <summary>
     /// Returns aggregated statistics about WiFi points by borough and program.
     /// </summary>
     [HttpGet("stats")]

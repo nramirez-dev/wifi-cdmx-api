@@ -24,6 +24,12 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
         await repository.GetByIdAsync(id)
             .MapAsync(ToNullableDto);
 
+    public async Task<WifiPointDto?> GetByOriginalIdAsync(string originalId)
+    {
+        var point = await repository.GetByOriginalIdAsync(originalId);
+        return point is null ? null : ToDto(point);
+    }
+
     public async Task<PagedResultDto<WifiPointDto>> GetByBoroughAsync(
         string borough, int page, int pageSize) =>
         await repository.GetByBoroughAsync(borough, page, pageSize)

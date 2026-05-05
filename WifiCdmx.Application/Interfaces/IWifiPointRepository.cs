@@ -11,6 +11,7 @@ public interface IWifiPointRepository
 {
     Task<(IEnumerable<WifiPoint> Items, int Total)> GetAllAsync(int page, int pageSize);
     Task<WifiPoint?> GetByIdAsync(Guid id);
+    Task<WifiPoint?> GetByOriginalIdAsync(string originalId);
     Task<(IEnumerable<WifiPoint> Items, int Total)> GetByBoroughAsync(string borough, int page, int pageSize);
     Task<(IEnumerable<WifiPoint> Items, int Total)> GetNearbyAsync(double latitude, double longitude, int page, int pageSize);
     Task<Dictionary<string, int>> GetStatsByBoroughAsync();

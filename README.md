@@ -8,7 +8,7 @@ The `/api/wifi-points/heatmap` endpoint returns geographic grid data ready to be
 
 ![WiFi CDMX Heatmap](docs/heatmap-preview.png)
 
-*Distribution of 539 public WiFi access points across Mexico City grouped into geographic grid cells. Denser clusters indicate higher WiFi coverage.*
+*Distribution of 35,344 public WiFi access points across Mexico City grouped into geographic grid cells. Denser clusters indicate higher WiFi coverage.*
 
 ---
 
@@ -43,7 +43,7 @@ This project follows **Clean Architecture** with clear separation of concerns ac
 | Framework | ASP.NET Core Web API |
 | Database | PostgreSQL 16 |
 | ORM | Entity Framework Core 8 |
-| CSV Parsing | CsvHelper |
+| Excel Parsing | ClosedXML |
 | Documentation | Swagger / OpenAPI |
 | Containerization | Docker + docker-compose |
 | Testing | xUnit + Moq |
@@ -75,7 +75,7 @@ WifiCdmx/
 │   └── Services/
 ├── NuGet.Config
 ├── data/
-│   └── wifi_cdmx.csv              # Source dataset
+│   └── wifi_cdmx.xlsx             # Official CDMX open data dataset
 ├── docker-compose.yml
 ├── Makefile
 └── .env.example
@@ -91,6 +91,7 @@ Base URL: `http://localhost:5000/api`
 |---|---|---|
 | GET | `/wifi-points` | Paginated list of all WiFi points |
 | GET | `/wifi-points/{id}` | Single WiFi point by ID |
+| GET | `/wifi-points/by-original-id/{originalId}` | Single WiFi point by original dataset ID |
 | GET | `/wifi-points/borough/{borough}` | WiFi points filtered by borough |
 | GET | `/wifi-points/nearby?lat={}&lon={}` | WiFi points ordered by proximity |
 | GET | `/wifi-points/stats` | Aggregated statistics |
@@ -109,17 +110,15 @@ All list endpoints support:
 {
   "data": [
     {
-      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      "name": "T-III Dr. Manuel Escontria",
-      "neighborhood": "SAN ANGEL",
-      "borough": "ÁLVARO OBREGÓN",
-      "latitude": 19.3428,
-      "longitude": -99.1933,
-      "accessPointCount": 2,
-      "program": "Centros_de_Salud"
+      "id": "0000e4d2-c972-4d8f-9654-197aa3ebac95",
+      "originalId": "PILARES_MARCELINO_BUENDIA_AP_01",
+      "program": "Pilares",
+      "latitude": 19.380467,
+      "longitude": -99.069407,
+      "borough": "Iztapalapa"
     }
   ],
-  "total": 539,
+  "total": 35344,
   "page": 1,
   "pageSize": 20
 }
@@ -128,16 +127,16 @@ All list endpoints support:
 **GET /api/wifi-points/stats**
 ```json
 {
-  "totalPoints": 539,
-  "totalAccessPoints": 1468,
+  "totalPoints": 35344,
+  "totalAccessPoints": 35344,
   "byBorough": [
-    { "name": "ÁLVARO OBREGÓN", "count": 99 },
-    { "name": "IZTAPALAPA", "count": 220 }
+    { "name": "IZTAPALAPA", "count": 9500 },
+    { "name": "ÁLVARO OBREGÓN", "count": 3200 }
   ],
   "byProgram": [
-    { "name": "PILARES", "count": 727 },
-    { "name": "Centros_de_Salud", "count": 330 },
-    { "name": "Sitios_Publicos", "count": 411 }
+    { "name": "PILARES", "count": 18000 },
+    { "name": "Centros_de_Salud", "count": 5000 },
+    { "name": "Sitios_Publicos", "count": 4000 }
   ]
 }
 ```
@@ -266,7 +265,6 @@ Open `.env` and set your preferred credentials:
 POSTGRES_DB=wifi_cdmx
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password_here
-CSV_FILE_PATH=/app/Data/wifi_cdmx.csv
 ```
 
 ### 3. Start all services
@@ -283,7 +281,7 @@ make up
 docker compose up -d
 ```
 
-PostgreSQL will start, migrations will run, and 539 WiFi points will be seeded automatically.
+PostgreSQL will start, migrations will run, and 35,344 WiFi points will be seeded automatically.
 
 ### 4. Verify the API is running
 
@@ -297,7 +295,7 @@ make logs
 docker compose logs -f api
 ```
 
-You should see: `Seeded 539 WiFi points successfully`
+You should see: `Seeded 35344 WiFi points successfully`
 
 ### 5. You are ready!
 
@@ -326,7 +324,6 @@ You should see: `Seeded 539 WiFi points successfully`
 | `POSTGRES_DB` | Database name | `wifi_cdmx` |
 | `POSTGRES_USER` | Database user | `postgres` |
 | `POSTGRES_PASSWORD` | Database password | — |
-| `CSV_FILE_PATH` | Path to the CSV file inside the container | `/app/Data/wifi_cdmx.csv` |
 
 ---
 
@@ -337,13 +334,11 @@ You should see: `Seeded 539 WiFi points successfully`
 | Column | Type | Description |
 |---|---|---|
 | `Id` | `uuid` | Primary key — auto-generated Guid |
-| `Name` | `varchar(200)` | Original name from CSV |
-| `Neighborhood` | `varchar(100)` | Colonia where the point is located |
-| `Borough` | `varchar(100)` | Alcaldía (indexed for fast filtering) |
-| `Latitude` | `double precision` | Geographic latitude |
-| `Longitude` | `double precision` | Geographic longitude |
-| `AccessPointCount` | `int` | Number of APs at this location |
-| `Program` | `varchar(100)` | Installation program (indexed) |
+| `OriginalId` | `varchar(200)` | Original ID from the official CDMX dataset (indexed) |
+| `Program` | `varchar(100)` | Installation program — maps to `programa` (indexed) |
+| `Borough` | `varchar(100)` | Alcaldía — maps to `alcaldia` (indexed) |
+| `Latitude` | `double precision` | Geographic latitude — maps to `latitud` |
+| `Longitude` | `double precision` | Geographic longitude — maps to `longitud` |
 
 ---
 
@@ -370,10 +365,10 @@ Functional programming principles were applied throughout: pure static mapping f
 The dataset has a fixed schema and benefits from indexed queries on `Borough` and `Program`. SQL fits naturally.
 
 **Why Haversine instead of PostGIS?**
-PostGIS adds operational overhead. For ~500 points, Haversine calculated by EF Core is efficient enough and keeps the stack lean.
+PostGIS adds operational overhead. For 35,344 points, Haversine calculated by EF Core is efficient enough and keeps the stack lean.
 
 **Why Guid as primary key?**
-The CSV uses descriptive names as IDs (e.g. "Alameda Central") which break URLs. Guid keeps the API clean while the original name is preserved in the `Name` field.
+The official dataset uses descriptive string IDs (e.g. `PILARES_MARCELINO_BUENDIA_AP_01`) which break URL routing. Guid keeps the API clean while the original ID is preserved in the `OriginalId` field and exposed via a dedicated endpoint.
 
 **Why Clean Architecture?**
 Each layer has a single responsibility. The service layer is fully unit-testable with mocked repositories — no database required to run tests.
@@ -385,4 +380,7 @@ Each layer has a single responsibility. The service layer is fully unit-testable
 A data company needs to visualize data. This endpoint returns pre-aggregated geographic grid cells ready for Kepler.gl, Leaflet or Google Maps — no client-side aggregation needed.
 
 **Why auto-seed on startup?**
-Zero manual steps. `docker-compose up` creates the database, runs migrations and loads 539 WiFi points automatically.
+Zero manual steps. `docker compose up` creates the database, runs migrations and loads 35,344 WiFi points from the official CDMX Excel dataset automatically.
+
+**Why a GetByOriginalId endpoint?**
+The official CDMX dataset uses descriptive string IDs (e.g. `PILARES_MARCELINO_BUENDIA_AP_01`). This endpoint allows consumers to cross-reference data directly with the government open data portal without needing to search by coordinates or paginate through results.

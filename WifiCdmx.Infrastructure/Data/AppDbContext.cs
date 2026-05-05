@@ -20,6 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             entity.HasIndex(e => e.Borough);
             entity.HasIndex(e => e.Program);
+            entity.HasIndex(e => e.OriginalId);
         });
     }
 }
