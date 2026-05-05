@@ -233,19 +233,18 @@ http://localhost:5000/graphql
 ## Getting Started
 
 ### Prerequisites
-- Docker Desktop installed and running
-- `make` (optional but recommended)
+- Docker Engine or Docker Desktop installed and running
+- `make` — optional helper (Linux: `sudo apt install make`, Mac: pre-installed, Windows: not required)
+
+> **Docker Compose note:** Modern Docker versions use `docker compose` (with a space). If you get a `distutils` or `module not found` error with `docker-compose`, use `docker compose` instead. Linux users can upgrade with:
+> ```bash
+> sudo apt remove docker-compose
+> sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+> ```
 
 ### 1. Clone the repository
 
-**Linux / Mac:**
 ```bash
-git clone https://github.com/nramirez-dev/wifi-cdmx-api.git
-cd wifi-cdmx-api
-```
-
-**Windows (PowerShell):**
-```powershell
 git clone https://github.com/nramirez-dev/wifi-cdmx-api.git
 cd wifi-cdmx-api
 ```
@@ -262,7 +261,7 @@ cp .env.example .env
 Copy-Item .env.example .env
 ```
 
-Open `.env` and set your preferred database password:
+Open `.env` and set your preferred credentials:
 ```env
 POSTGRES_DB=wifi_cdmx
 POSTGRES_USER=postgres
@@ -274,32 +273,28 @@ CSV_FILE_PATH=/app/Data/wifi_cdmx.csv
 
 The dataset is already included in the `data/` folder — no extra steps needed.
 
-**Linux / Mac:**
+**Using make (Linux/Mac):**
 ```bash
 make up
-# or
-docker-compose up -d
 ```
 
-**Windows (PowerShell):**
-```powershell
-docker-compose up -d
+**Using docker compose directly (all platforms):**
+```bash
+docker compose up -d
 ```
 
 PostgreSQL will start, migrations will run, and 539 WiFi points will be seeded automatically.
 
 ### 4. Verify the API is running
 
-**Linux / Mac:**
+**Using make:**
 ```bash
 make logs
-# or
-docker-compose logs -f api
 ```
 
-**Windows (PowerShell):**
-```powershell
-docker-compose logs -f api
+**Using docker compose directly:**
+```bash
+docker compose logs -f api
 ```
 
 You should see: `Seeded 539 WiFi points successfully`
@@ -312,18 +307,15 @@ You should see: `Seeded 539 WiFi points successfully`
 | GraphQL IDE | http://localhost:5000/graphql |
 | REST API | http://localhost:5000/api/wifi-points |
 
-### Available make commands
+### Available commands
 
-> Note: `make` commands are available on Linux/Mac. Windows users can use the `docker-compose` equivalents directly.
-
-| Command | Description |
-|---|---|
-| `make up` | Start all services |
-| `make down` | Stop all services |
-| `make build` | Rebuild Docker images |
-| `make logs` | Follow API logs |
-| `make migrate` | Run EF Core migrations locally |
-| `make clean` | Remove containers and volumes |
+| make | docker compose equivalent | Description |
+|---|---|---|
+| `make up` | `docker compose up -d` | Start all services |
+| `make down` | `docker compose down` | Stop all services |
+| `make build` | `docker compose build` | Rebuild Docker images |
+| `make logs` | `docker compose logs -f api` | Follow API logs |
+| `make clean` | `docker compose down -v` | Remove containers and volumes |
 
 ---
 
