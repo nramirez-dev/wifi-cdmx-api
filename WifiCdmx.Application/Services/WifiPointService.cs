@@ -36,12 +36,10 @@ public class WifiPointService(IWifiPointRepository repository) : IWifiPointServi
 
     public async Task<StatsDto> GetStatsAsync()
     {
-        // Concurrent async composition — all queries run in parallel
-        var (byBorough, byProgram, all) = await (
-            repository.GetStatsByBoroughAsync(),
-            repository.GetStatsByProgramAsync(),
-            repository.GetAllAsync(1, int.MaxValue)
-        ).WhenAll();
+        // Sequential execution — EF Core scoped DbContext does not support concurrent operations
+        var byBorough = await repository.GetStatsByBoroughAsync();
+        var byProgram = await repository.GetStatsByProgramAsync();
+        var all = await repository.GetAllAsync(1, int.MaxValue);
 
         return new StatsDto(
             TotalPoints: all.Total,

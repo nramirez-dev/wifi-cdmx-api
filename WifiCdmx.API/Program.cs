@@ -19,6 +19,10 @@ builder.Services.AddScoped<CsvSeeder>();
 // --- Controllers ---
 builder.Services.AddControllers();
 
+// GraphQL endpoint using HotChocolate — parallel to REST API
+builder.Services.AddGraphQLServer()
+    .AddQueryType<WifiCdmx.API.GraphQL.Queries.WifiPointQuery>();
+
 // --- Swagger ---
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -32,7 +36,7 @@ builder.Services.AddSwaggerGen(c =>
 
     // Include XML comments in Swagger
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
         c.IncludeXmlComments(xmlPath);
 });
@@ -57,5 +61,6 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WiFi CDMX A
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapGraphQL();
 
 app.Run();
