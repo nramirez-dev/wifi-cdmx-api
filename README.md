@@ -127,16 +127,16 @@ All list endpoints support:
 ```json
 {
   "totalPoints": 539,
-  "totalAccessPoints": 1250,
-  "byBorough": {
-    "ÁLVARO OBREGÓN": 45,
-    "IZTAPALAPA": 120
-  },
-  "byProgram": {
-    "PILARES": 224,
-    "Centros_de_Salud": 215,
-    "Sitios_Publicos": 100
-  }
+  "totalAccessPoints": 1468,
+  "byBorough": [
+    { "name": "ÁLVARO OBREGÓN", "count": 99 },
+    { "name": "IZTAPALAPA", "count": 220 }
+  ],
+  "byProgram": [
+    { "name": "PILARES", "count": 727 },
+    { "name": "Centros_de_Salud", "count": 330 },
+    { "name": "Sitios_Publicos", "count": 411 }
+  ]
 }
 ```
 
@@ -159,12 +159,20 @@ In addition to the REST API, a GraphQL endpoint is available at `POST /graphql` 
 
 ### Example queries
 
-**Get total points and access point count:**
+**Get total points and breakdown by borough:**
 ```graphql
 {
   stats {
     totalPoints
     totalAccessPoints
+    byBorough {
+      name
+      count
+    }
+    byProgram {
+      name
+      count
+    }
   }
 }
 ```
