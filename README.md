@@ -234,48 +234,87 @@ http://localhost:5000/graphql
 ### Prerequisites
 - Docker Desktop installed and running
 - `make` (optional but recommended)
-- A copy of `wifi_cdmx.csv` placed inside the `data/` folder at the solution root
 
 ### 1. Clone the repository
+
+**Linux / Mac:**
 ```bash
 git clone https://github.com/nramirez-dev/wifi-cdmx-api.git
 cd wifi-cdmx-api
 ```
 
+**Windows (PowerShell):**
+```powershell
+git clone https://github.com/nramirez-dev/wifi-cdmx-api.git
+cd wifi-cdmx-api
+```
+
 ### 2. Set up environment variables
+
+**Linux / Mac:**
 ```bash
 cp .env.example .env
 ```
-Open `.env` and set your preferred database password.
 
-### 3. Add the CSV dataset
-Place `wifi_cdmx.csv` inside the `data/` folder:
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
 ```
-wifi-cdmx-api/
-└── data/
-    └── wifi_cdmx.csv
-```
-The API will automatically read, process and seed the database on first startup.
 
-### 4. Start all services
+Open `.env` and set your preferred database password:
+```env
+POSTGRES_DB=wifi_cdmx
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password_here
+CSV_FILE_PATH=/app/Data/wifi_cdmx.csv
+```
+
+### 3. Start all services
+
+The dataset is already included in the `data/` folder — no extra steps needed.
+
+**Linux / Mac:**
 ```bash
 make up
 # or
 docker-compose up -d
 ```
 
-### 5. Verify the API is running
+**Windows (PowerShell):**
+```powershell
+docker-compose up -d
+```
+
+PostgreSQL will start, migrations will run, and 539 WiFi points will be seeded automatically.
+
+### 4. Verify the API is running
+
+**Linux / Mac:**
 ```bash
 make logs
 # or
 docker-compose logs -f api
 ```
+
+**Windows (PowerShell):**
+```powershell
+docker-compose logs -f api
+```
+
 You should see: `Seeded 539 WiFi points successfully`
 
-### 6. Open Swagger UI
-http://localhost:5000/swagger
+### 5. You are ready!
 
-### Available commands
+| Service | URL |
+|---|---|
+| Swagger UI | http://localhost:5000/swagger |
+| GraphQL IDE | http://localhost:5000/graphql |
+| REST API | http://localhost:5000/api/wifi-points |
+
+### Available make commands
+
+> Note: `make` commands are available on Linux/Mac. Windows users can use the `docker-compose` equivalents directly.
+
 | Command | Description |
 |---|---|
 | `make up` | Start all services |
