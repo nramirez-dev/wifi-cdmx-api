@@ -204,9 +204,10 @@ In addition to the REST API, a GraphQL endpoint is available at `POST /graphql` 
 ```graphql
 {
   heatmap(gridSize: 0.01) {
-    latCell
-    lonCell
-    count
+    latitude
+    longitude
+    pointCount
+    totalAccessPoints
   }
 }
 ```
@@ -294,7 +295,8 @@ http://localhost:5000/swagger
 
 | Column | Type | Description |
 |---|---|---|
-| `Id` | `varchar(200)` | Primary key — taken from CSV |
+| `Id` | `uuid` | Primary key — auto-generated Guid |
+| `Name` | `varchar(200)` | Original name from CSV |
 | `Neighborhood` | `varchar(100)` | Colonia where the point is located |
 | `Borough` | `varchar(100)` | Alcaldía (indexed for fast filtering) |
 | `Latitude` | `double precision` | Geographic latitude |
