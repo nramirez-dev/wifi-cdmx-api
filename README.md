@@ -94,6 +94,7 @@ Base URL: `http://localhost:5000/api`
 | GET | `/wifi-points/borough/{borough}` | WiFi points filtered by borough |
 | GET | `/wifi-points/nearby?lat={}&lon={}` | WiFi points ordered by proximity |
 | GET | `/wifi-points/stats` | Aggregated statistics |
+| GET | `/wifi-points/heatmap?gridSize=0.01` | Geographic grid cells for heatmap visualization |
 
 ### Query Parameters
 
